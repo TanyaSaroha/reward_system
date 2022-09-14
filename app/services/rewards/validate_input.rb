@@ -7,14 +7,18 @@ module Rewards
     ACTIONS = ["recommends", "accepts"]
 
     validates :file, presence: true
-    validate :validate_each_row, :order_of_rows
+    validate :validate_file, :validate_each_row, :order_of_rows
 
     def initialize(file)
       @file = file
-      @data = File.open(file, 'r').map{|row| row}.join
+      @receivers = []
     end
 
     private
+
+    def validate_file
+      @data = File.open(file, 'r').map{|row| row}.join
+    end
 
     def validate_each_row
       data.split("\n").each.with_index do |row, line|
@@ -26,7 +30,7 @@ module Rewards
     end
 
     def order_of_rows
-      errors.add(:date, 'Order of Dates is incorrect. Must be in chronological order.') unless dates_are_in_order?
+      errors.add(:date, 'Order is incorrect. Must be in chronological order.') unless dates_are_in_order?
     end
 
     def all_dates
@@ -45,8 +49,13 @@ module Rewards
     def validate_date(row, line)
       parse_date(row)
     rescue ArgumentError
-      errors.add(:date, "Invalid Date given at #{line} line")
+      errors.add(:date, "Invalid at line #{line}")
       throw(:abort)
+    end
+
+    def parse_date(row)
+      strtime = row.strip.first(16)
+      Time.zone.parse(strtime)
     end
 
     def validate_actions(row, line)
@@ -54,7 +63,7 @@ module Rewards
         row.downcase.include?(keyword)
       end.any?
 
-      errors.add(:action, "Invitation is invalid at #{line} line")
+      errors.add(:action, "is invalid at line #{line}")
       throw(:abort)
     end
 
@@ -65,33 +74,29 @@ module Rewards
 
     def validate_recommends(row, line)
       return unless row.include?('recommends')
-      return if inviter_found?(row)
+      details = row.split(" ") 
+      return if details.size == 5 && receiver_present?(details)
 
-      errors.add(:action, "Sender invalid at #{line} line")
+      errors.add(:base, "Invalid data at line #{line}. Both sender and receiver must be present")
       throw(:abort)
     end
 
     def validate_accepts(row, line)
       return unless row.include?('accepts')
-      return if no_inviter?(row)
+      details = row.split(" ")
+      return if details.size == 4 && acceptor_valid?(details)
 
-      errors.add(:action, "Sender invalid at #{line} line")
+      errors.add(:base, "Sender invalid at line #{line}.")
       throw(:abort)
     end
 
-    def inviter_found?(row)
-      action_line = row.index('recommends')
-      row[action_line..-1].delete('recommends').gsub(/\s+/, '').present?
+    def receiver_present?(details)
+      @receivers << details[4] if details[4].present?
+      details[3] == "recommends" && details[4].present?
     end
 
-    def no_inviter?(row)
-      action_line = row.index('accepts')
-      row[action_line..-1].delete('accepts').gsub(/\s+/, '').blank?
-    end
-
-    def parse_date(row)
-      strtime = row.strip.first(16)
-      Time.zone.parse(strtime)
+    def acceptor_valid?(details)
+      details[2].present? && details[3] == "accepts" && @receivers.include?(details[2])
     end
 
   end
