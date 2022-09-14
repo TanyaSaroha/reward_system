@@ -29,8 +29,7 @@ service.get_points
 - Rails Version - 7.0.3
 - Clone the repo
 - Start rails server
-- Command to run
-You can call the Webservice endpoint with request body contains only the file. It returns the total points for each user in reponse.
+- To run - You can call the Webservice endpoint with request body contains only the file. It returns the total points for each user in reponse.
 ```
     Endpoint: POST http://localhost:3000/rewards
     Body: {file: attachment}
