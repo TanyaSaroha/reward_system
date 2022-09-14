@@ -11,5 +11,10 @@ module Rewards
       @parent = parent
       @status = status
     end
+
+    def accepts?
+      status == "accepted"
+    end
+    
   end
 end
