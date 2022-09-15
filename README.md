@@ -35,6 +35,13 @@ service.get_points
     Body: {file: attachment}
 ```
 
+#### Running Specs
+- Added rspec specs for the web endopint as well as service objects.
+- To run - You can user the command
+```
+    rspec spec/
+```
+
 #### Assumptions
 - Input will come in a file in simple text format with every action in different line.
 - Only sending invites and accepting invites are the 2 actions that take place.
