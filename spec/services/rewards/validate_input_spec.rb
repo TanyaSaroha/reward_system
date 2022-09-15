@@ -1,26 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Rewards::ValidateInput do
-  it "should be successful" do
-    input_string = "2018-06-12 09:41 A recommends B
-    2018-06-14 09:41 B accepts
-    2018-06-16 09:41 B recommends C
-    2018-06-17 09:41 C accepts
-    2018-06-19 09:41 C recommends D
-    2018-06-23 09:41 B recommends D
-    2018-06-25 09:41 D accepts"
-
-    File.open('input_file', 'w') { |file| file.write(input_string) }
-    file = File.open('input_file')
-    validator = Rewards::ValidateInput.new(file)
-
-    expect(validator.invalid?).to be_falsy
-    expect(validator.errors).to_not be_present
-    File.delete(file)
-  end
 
   context "fails" do
-
     it "when invite sender is invalid" do
       input_string = "2018-06-12 09:41 A recommends"
 
@@ -74,6 +56,18 @@ RSpec.describe Rewards::ValidateInput do
     end
 
     it "should not allow input like A invites B, C accepts" do
+      input_string = "2018-06-12 09:41 A recommends B
+      2018-06-13 09:41 C accepts
+      "
+
+      File.open('input_file', 'w') { |file| file.write(input_string) }
+      file = File.open('input_file')
+      validator = Rewards::ValidateInput.new(file)
+
+      expect(validator.invalid?).to be_truthy
+      expect(validator.errors).to be_present
+      expect(validator.errors.full_messages).to include("Sender invalid at line 1.")
+      File.delete(file)
     end
 
     it "when action is invalid" do
@@ -86,6 +80,20 @@ RSpec.describe Rewards::ValidateInput do
       expect(validator.invalid?).to be_truthy
       expect(validator.errors).to be_present
       expect(validator.errors.full_messages).to include("Action is invalid at line 0")
+      File.delete(file)
+    end
+
+    it "when action is not given" do
+      input_string = "2018-06-12 09:41 A recommends B
+      2018-06-13 09:41 A C"
+
+      File.open('input_file', 'w') { |file| file.write(input_string) }
+      file = File.open('input_file')
+      validator = Rewards::ValidateInput.new(file)
+
+      expect(validator.invalid?).to be_truthy
+      expect(validator.errors).to be_present
+      expect(validator.errors.full_messages).to include("Action is invalid at line 1")
       File.delete(file)
     end
 
@@ -114,6 +122,24 @@ RSpec.describe Rewards::ValidateInput do
       expect(validator.errors.full_messages).to include("Date Order is incorrect. Must be in chronological order.")
       File.delete(file)
     end
-
   end
+
+  it "should be successful for valid data" do
+    input_string = "2018-06-12 09:41 A recommends B
+    2018-06-14 09:41 B accepts
+    2018-06-16 09:41 B recommends C
+    2018-06-17 09:41 C accepts
+    2018-06-19 09:41 C recommends D
+    2018-06-23 09:41 B recommends D
+    2018-06-25 09:41 D accepts"
+
+    File.open('input_file', 'w') { |file| file.write(input_string) }
+    file = File.open('input_file')
+    validator = Rewards::ValidateInput.new(file)
+
+    expect(validator.invalid?).to be_falsy
+    expect(validator.errors).to_not be_present
+    File.delete(file)
+  end
+
 end

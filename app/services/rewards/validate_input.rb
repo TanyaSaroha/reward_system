@@ -41,6 +41,7 @@ module Rewards
     end
 
     def dates_are_in_order?
+      return true if all_dates.size < 2
       all_dates.map.with_index do |date, line|
         date <=> all_dates[line + 1]
       end.uniq.first.negative?

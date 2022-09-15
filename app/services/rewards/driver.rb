@@ -17,14 +17,8 @@ module Rewards
 
     private
 
-    def formatted_rows
-      @formatted_rows ||= data.split("\n").map do |row|
-        Row.new(row)
-      end
-    end
-
     def sorted_rows
-      formatted_rows.sort { |a, b|  a.date <=> b.date }
+      data.split("\n").map{ |row| Row.new(row) }.sort { |a, b|  a.date <=> b.date }
     end
 
   end

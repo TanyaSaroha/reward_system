@@ -15,6 +15,7 @@ module Rewards
 
     def reward_points(key)
       user = user_info[key]
+      return if user.accepts?
       user.status = "accepted"
       add_points_to_parents(user, 1) if user.accepts?
       user
