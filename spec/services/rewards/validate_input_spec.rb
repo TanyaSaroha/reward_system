@@ -110,6 +110,19 @@ RSpec.describe Rewards::ValidateInput do
       File.delete(file)
     end
 
+    it "when date is not present" do
+      input_string = "A recommends B"
+  
+      File.open('input_file', 'w') { |file| file.write(input_string) }
+      file = File.open('input_file')
+      validator = Rewards::ValidateInput.new(file)
+  
+      expect(validator.invalid?).to be_truthy
+      expect(validator.errors).to be_present
+      expect(validator.errors.full_messages).to include("Date missing at line 0")
+      File.delete(file)
+    end
+
     it "when date sequence is invalid" do
       input_string = "2018-06-12 09:41 A recommends B\n2018-06-10 09:41 B accepts"
   

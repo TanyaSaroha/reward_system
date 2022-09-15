@@ -48,14 +48,18 @@ module Rewards
     end
 
     def validate_date(row, line)
-      parse_date(row)
+      date = parse_date(row)
+      return if date
+      errors.add(:date, "missing at line #{line}")
+      throw(:abort)
     rescue ArgumentError
       errors.add(:date, "Invalid at line #{line}")
       throw(:abort)
     end
 
     def parse_date(row)
-      strtime = row.strip.first(16)
+      ###need to add check if date is not present here.
+      strtime = "#{row.split(' ')[0]} #{row.split(' ')[1]}"
       Time.zone.parse(strtime)
     end
 

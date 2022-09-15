@@ -5,9 +5,9 @@ module Rewards
     def initialize(row_data)
       @row = row_data.strip
       @date = parse_date(row)
-      @action = fill_action(row)
-      @from = fill_from(row)
-      @to = fill_to(row)
+      @action = row.include?('accepts') ? :accepts : :recommends
+      @from = row.split(' ')[2]
+      @to = row.split(' ')[4] if recommends?
     end
 
     def accepts?
@@ -20,22 +20,8 @@ module Rewards
 
     private
 
-    def fill_action(row)
-      row.include?('accepts') ? :accepts : :recommends
-    end
-
-    def fill_from(row)
-      row.split(' ')[2]
-    end
-
-    def fill_to(row)
-      return unless recommends?
-
-      row.split(' ')[4]
-    end
-
     def parse_date(row)
-      strtime = row.strip.first(16)
+      strtime = "#{row.split(' ')[0]} #{row.split(' ')[1]}"
       Time.zone.parse(strtime)
     end
 

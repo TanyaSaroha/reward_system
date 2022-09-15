@@ -89,6 +89,26 @@ RSpec.describe Rewards::Calculator do
         File.delete(file)
       end
 
+      it "Calculating user points for users inviting each other accepts" do
+        input_string = "2018-06-12 09:41 A recommends B
+        2018-06-14 09:41 B accepts
+        2018-06-16 09:41 B recommends A
+        2018-06-16 09:41 A accepts"
+
+        File.open('input_file', 'w') { |file| file.write(input_string) }
+        file = File.open('input_file')
+        validator = Rewards::ValidateInput.new(file)
+        validator.invalid?
+
+        rows = validator.data.split("\n").map{ |row| Rewards::Row.new(row) }.sort { |a, b|  a.date <=> b.date }
+        points = Rewards::Calculator.new(rows).points
+
+        expect(points).to be_present
+        expect(points["A"]).to eq(1)
+        expect(points["B"]).to eq(nil)
+        File.delete(file)
+      end
+
     end
   end
 end
