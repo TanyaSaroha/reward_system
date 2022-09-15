@@ -1,13 +1,13 @@
 module Rewards
   class Row
-    attr_reader :date, :to, :from, :action, :row
+    attr_reader :date, :receiver, :sender, :action, :row
 
     def initialize(row_data)
       @row = row_data.strip
-      @date = parse_date(row)
       @action = row.include?('accepts') ? :accepts : :recommends
-      @from = row.split(' ')[2]
-      @to = row.split(' ')[4] if recommends?
+      @sender = row.split(' ')[2]
+      @receiver = row.split(' ')[4] if recommends?
+      @date = parse_date(row)
     end
 
     def accepts?

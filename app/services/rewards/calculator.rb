@@ -8,7 +8,7 @@ module Rewards
 
     def points
       #Converting all rows into user connections via referrals
-      rows.each{ |row| row.recommends? ? referral_map.add_user(row.from, row.to) : referral_map.reward_points(row.from) }
+      rows.each{ |row| row.recommends? ? referral_map.add_user(row.sender, row.receiver) : referral_map.reward_points(row.sender) }
       referral_map.user_points
     end
 

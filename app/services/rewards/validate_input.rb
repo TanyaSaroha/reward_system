@@ -58,7 +58,6 @@ module Rewards
     end
 
     def parse_date(row)
-      ###need to add check if date is not present here.
       strtime = "#{row.split(' ')[0]} #{row.split(' ')[1]}"
       Time.zone.parse(strtime)
     end
@@ -73,12 +72,11 @@ module Rewards
     end
 
     def validate_users(row, line)
-      validate_recommends(row, line)
-      validate_accepts(row, line)
+      validate_sender_receiver(row, line) if row.include?('recommends')
+      validate_invite_accepter(row, line) if row.include?('accepts')
     end
 
-    def validate_recommends(row, line)
-      return unless row.include?('recommends')
+    def validate_sender_receiver(row, line)
       details = row.split(" ") 
       return if details.size == 5 && receiver_present?(details)
 
@@ -86,18 +84,17 @@ module Rewards
       throw(:abort)
     end
 
-    def validate_accepts(row, line)
-      return unless row.include?('accepts')
+    def receiver_present?(details)
+      @receivers << details[4] if details[4].present?
+      details[3] == "recommends" && details[4].present?
+    end
+
+    def validate_invite_accepter(row, line)
       details = row.split(" ")
       return if details.size == 4 && acceptor_valid?(details)
 
       errors.add(:base, "Sender invalid at line #{line}.")
       throw(:abort)
-    end
-
-    def receiver_present?(details)
-      @receivers << details[4] if details[4].present?
-      details[3] == "recommends" && details[4].present?
     end
 
     def acceptor_valid?(details)
