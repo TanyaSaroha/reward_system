@@ -11,7 +11,7 @@ Sample Input
 2018-06-23 09:41 B recommends D
 2018-06-25 09:41 D accepts
 ```
-The inviter gets (1/2)^k points for each confirmed invitation, where k is the level of the invitation. So this would compute as
+The invite sender gets (1/2)^k points for each confirmed invitation, where k is the level of the invitation. So this would compute as
 
 ```
 { “A”: 1.75, “B”: 1.5, “C”: 1 }
@@ -27,13 +27,39 @@ service.get_points
 #### Running Locally
 - Ruby Version - 2.7.5
 - Rails Version - 7.0.3
-- Clone the repo
-- Start rails server
-- To run - You can call the Webservice endpoint with request body contains only the file. It returns the total points for each user in reponse.
+- Clone the repository using
 ```
+git clone git@github.com:TanyaSaroha/reward_system.git
+```
+- Go to the cloned repo
+```
+cd reward_system
+```
+- Inside the repo, first install the dependencies using
+```
+bundle install
+```
+- Once the dependencies are successfully installed you can start server using
+```
+rails s
+```
+
+- Once you have your running server - You can call the Web service endpoint with request body contains only the file. It returns the total points for each user in reponse.
+
+ - Using cURL
+
+    ```
+    curl -X POST -F 'file=@lib/input' http://localhost:3000/rewards
+    ```
+        
+    Note: The path of the  in above request file is relative. Test input file is placed inside the repo: lib/input
+
+  - Using Postman or any other API platform:
+
+    ```
     Endpoint: POST http://localhost:3000/rewards
     Body: {file: attachment}
-```
+    ```
 
 #### Running Specs
 - Added rspec specs for the web endpoint as well as service objects.
