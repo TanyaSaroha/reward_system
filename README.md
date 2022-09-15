@@ -36,8 +36,8 @@ service.get_points
 ```
 
 #### Running Specs
-- Added rspec specs for the web endopint as well as service objects.
-- To run - You can user the command
+- Added rspec specs for the web endpoint as well as service objects.
+- To run - You can use the following command:
 ```
     rspec spec/
 ```
